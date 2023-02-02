@@ -9,10 +9,10 @@
     "dist"
   ],
   "main": "./dist/netflex-cdn-url.umd.js",
-  "module": "./dist/netflex-cdn-url.es.js",
+  "module": "./dist/netflex-cdn-url.mjs",
   "exports": {
     ".": {
-      "import": "./dist/netflex-cdn-url.es.js",
+      "import": "./dist/netflex-cdn-url.mjs",
       "require": "./dist/netflex-cdn-url.umd.js"
     }
   },
@@ -28,8 +28,8 @@
   "homepage": "https://github.com/apility/netflex-cdn-url/tree/main#readme",
   "devDependencies": {
     "@types/node": "^17.0.39",
-    "typescript": "^4.5.4",
-    "vite": "^2.9.9",
-    "vite-plugin-dts": "^1.2.0"
+    "typescript": "^4.9.5",
+    "vite": "^4.1.1",
+    "vite-plugin-dts": "^1.7.2"
   }
 }
