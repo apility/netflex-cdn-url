@@ -21,9 +21,15 @@ export type Mode =
 
 export type SizeMode = CropMode | ResizeCropMode | ExactMode | PortraitMode | LandscapeMode | AutoMode
 
-export type Size = `${number}x${number}`
+export type SizeString = `${number}x${number}`
+export type Size = SizeString | `${number}` | number | [number] | [number, number]
 
-export type Fill = `${number},${number},${number}` | `${number},${number},${number},${number}`
+export type FillStringShort = `${number},${number},${number}`
+export type FillStringLong = `${number},${number},${number},${number}`
+export type FillString = FillStringShort | FillStringLong
+export type FillTupleShort = [number, number, number]
+export type FillTupleLong = [number, number, number, number]
+export type Fill = FillString | FillTupleShort | FillTupleLong
 
 export type TopFocalPoint = 't'
 export type TopLeftFocalPoint = 'tl'
@@ -36,7 +42,7 @@ export type RightFocalPoint = 'r'
 export type CenterFocalPoint = 'c'
 
 export type FocalPoint =
-| TopFocalPoint
+  | TopFocalPoint
   | TopLeftFocalPoint
   | TopRightFocalPoint
   | BottomFocalPoint
@@ -49,3 +55,5 @@ export type FocalPoint =
 export type Parameter = Fill | FocalPoint
 
 export type CdnUrl = `${string}.cloudfront.net`
+
+export type FilePath = `${number}/${string}`
