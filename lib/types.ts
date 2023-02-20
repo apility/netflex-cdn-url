@@ -21,15 +21,18 @@ export type Mode =
 
 export type SizeMode = CropMode | ResizeCropMode | ExactMode | PortraitMode | LandscapeMode | AutoMode
 
-export type SizeString = `${number}x${number}`
-export type Size = SizeString | `${number}` | number | [number] | [number, number]
+export type SizeNumber = number
+export type SizeShortString = `${number}`
+export type SizeLongString = `${number}x${number}`
+export type SizeShortTuple = [number]
+export type SizeLongTuple = [number, number]
+export type Size = SizeLongString | SizeShortString | SizeNumber | SizeShortTuple | SizeLongTuple
 
-export type FillStringShort = `${number},${number},${number}`
-export type FillStringLong = `${number},${number},${number},${number}`
-export type FillString = FillStringShort | FillStringLong
-export type FillTupleShort = [number, number, number]
-export type FillTupleLong = [number, number, number, number]
-export type Fill = FillString | FillTupleShort | FillTupleLong
+export type FillShortString = `${number},${number},${number}`
+export type FillLongString = `${number},${number},${number},${number}`
+export type FillShortTuple = [number, number, number]
+export type FillLongTuple = [number, number, number, number]
+export type Fill = FillShortString | FillLongString | FillShortTuple | FillLongTuple
 
 export type TopFocalPoint = 't'
 export type TopLeftFocalPoint = 'tl'

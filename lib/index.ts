@@ -1,2 +1,2 @@
-export * from './cdnUrl'
 export * from './types'
+export { createCdnFileUrl, createCdnMediaUrl } from './cdnUrl'

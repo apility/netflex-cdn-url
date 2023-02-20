@@ -1,81 +1,112 @@
 import {
   CdnUrl,
   FilePath,
+  Mode,
   OriginalMode,
   SizeMode,
   Size,
   FillMode,
-  ResizeCropFocalPointMode,
   Fill,
+  FillShortTuple,
+  FillShortString,
+  FillLongString,
+  ResizeCropFocalPointMode,
   FocalPoint,
-  Mode,
   Parameter,
-  SizeString,
-  FillTupleShort,
-  FillStringShort,
-  FillStringLong,
+  SizeShortString,
+  SizeNumber,
+  SizeLongString,
+  SizeShortTuple,
+  SizeLongTuple,
 } from './types'
 
-export const createCdnFileUrl = <C extends CdnUrl, F extends FilePath>(cdnUrl: CdnUrl, filePath: F) => {
-  const cdnUrlWithScheme = cdnUrl.startsWith('http')
+export type EnsureCdnUrlScheme<T extends CdnUrl> = T extends `http://${CdnUrl}` | `https://${CdnUrl}`
+  ? T
+  : `https://${T}`
+
+const ensureCdnUrlScheme = <T extends CdnUrl> (cdnUrl: T) => {
+  const cdnUrlWithScheme = cdnUrl.match(/^https?:\/\/.*/)
     ? cdnUrl
     : `https://${cdnUrl}`
 
-  return `${cdnUrlWithScheme}/${filePath}` as `http${number}://${C}/${F}`
+  return cdnUrlWithScheme as EnsureCdnUrlScheme<T>
 }
 
-const normalizeSize = (size: Size): SizeString => {
-  if (typeof size === 'string') {
-    return (size.includes('x') ? size : `${size}x${size}`) as SizeString
-  }
-
-  if (typeof size === 'number') {
-    return `${size}x${size}`
-  }
-
-  return `${size.at(0)}x${size.at(-1)}` as SizeString
-}
-
-const normalizeFill = <F extends Fill>(fill: F)  => (
-  typeof fill === 'string'
-    ? fill as F extends FillStringShort ? FillStringShort : FillStringLong
-    : fill.join(',') as F extends FillTupleShort ? FillStringShort : FillStringLong
+export const createCdnFileUrl = <C extends CdnUrl, F extends FilePath> (cdnUrl: C, filePath: F) => (
+  `${ensureCdnUrlScheme(cdnUrl)}/${filePath}` as const
 )
 
-export function createCdnMediaUrl <C extends CdnUrl, F extends FilePath>(
+export type NormalizeSize<T extends Size> = T extends SizeLongString
+  ? T
+  : T extends SizeShortString | SizeNumber
+    ? `${T}x${T}`
+    : T extends SizeShortTuple
+      ? `${T[0]}x${T[0]}`
+      : T extends SizeLongTuple
+        ? `${T[0]}x${T[1]}`
+        : never
+
+const normalizeSize = <T extends Size>(size: T): NormalizeSize<T> => {
+  const normalizedSize = typeof size === 'string'
+    ? (size.includes('x') ? size : `${size}x${size}`)
+    : typeof size === 'number'
+      ? `${size}x${size}`
+      : `${size.at(0)}x${size.at(-1)}`
+
+  return normalizedSize as NormalizeSize<T>
+}
+
+export type NormalizeFill<T extends Fill> = T extends FillShortString | FillLongString
+  ? T
+  : T extends FillShortTuple
+    ? `${T[0]},${T[1]},${T[2]}`
+    : `${T[0]},${T[1]},${T[2]},${T[3]}`
+
+const normalizeFill = <T extends Fill> (fill: T) => {
+  const normalizedFill = typeof fill === 'string'
+    ? fill
+    : fill.join(',')
+
+  return normalizedFill as NormalizeFill<T>
+}
+
+export function createCdnMediaUrl<C extends CdnUrl, FP extends FilePath> (
   cdnUrl: C,
-  filePath: F,
+  filePath: FP,
   mode: OriginalMode,
-): `http${string}://${C}/media/${OriginalMode}/${F}`
-export function createCdnMediaUrl<C extends CdnUrl, F extends FilePath, SM extends SizeMode> (
+): `${EnsureCdnUrlScheme<C>}/media/${OriginalMode}/${FP}`
+export function createCdnMediaUrl<C extends CdnUrl, FP extends FilePath, SM extends SizeMode, S extends Size> (
   cdnUrl: C,
-  filePath: F,
+  filePath: FP,
   mode: SM,
-  size: Size,
-): `http${string}://${C}/media/${SM}/${SizeString}/${F}`
-export function createCdnMediaUrl<C extends CdnUrl, F extends FilePath, FI extends Fill> (
+  size: S,
+): `${EnsureCdnUrlScheme<C>}/media/${SM}/${NormalizeSize<S>}/${FP}`
+export function createCdnMediaUrl<C extends CdnUrl, FP extends FilePath, F extends Fill, S extends Size> (
   cdnUrl: C,
-  filePath: F,
+  filePath: FP,
   mode: FillMode,
-  size: Size,
-  fill: FI,
-): `http${string}://${C}/media/${FillMode}/${SizeString}/${FI extends (FillTupleShort | FillStringShort) ? FillStringShort : FillStringLong}/${F}`
-export function createCdnMediaUrl<C extends CdnUrl, F extends FilePath, FP extends FocalPoint> (
+  size: S,
+  fill: F,
+): `${EnsureCdnUrlScheme<C>}/media/${FillMode}/${NormalizeSize<S>}/${NormalizeFill<F>}/${FP}`
+export function createCdnMediaUrl<C extends CdnUrl, FP extends FilePath, S extends Size, FPO extends FocalPoint> (
   cdnUrl: C,
-  filePath: F,
+  filePath: FP,
   mode: ResizeCropFocalPointMode,
-  size: Size,
-  focalPoint: FP,
-): `http${string}://${C}/media/${ResizeCropFocalPointMode}/${SizeString}/${FP}/${F}`
-export function createCdnMediaUrl<C extends CdnUrl, F extends FilePath, M extends Mode, P extends Parameter> (
+  size: S,
+  focalPoint: FPO,
+): `${EnsureCdnUrlScheme<C>}/media/${ResizeCropFocalPointMode}/${NormalizeSize<S>}/${FPO}/${FP}`
+export function createCdnMediaUrl<C extends CdnUrl, F extends FilePath, M extends Mode, S extends Size, P extends Parameter> (
   cdnUrl: C,
   filePath: F,
   mode: M,
-  size?: Size,
+  size?: S,
   parameter?: P,
-): `http${string}://${C}/media/${M}/${F}` |
-  `http${string}://${C}/media/${M}/${SizeString}/${F}` |
-  `http${string}://${C}/media/${M}/${SizeString}/${M extends ResizeCropFocalPointMode ? (P extends FocalPoint ? P : never) : (P extends (FillTupleShort | FillStringShort) ? FillStringShort : FillStringLong)}/${F}`
+): `${EnsureCdnUrlScheme<C>}/media/${M}/${F}` |
+  `${EnsureCdnUrlScheme<C>}/media/${M}/${NormalizeSize<S>}/${F}` |
+  `${EnsureCdnUrlScheme<C>}/media/${M}/${NormalizeSize<S>}/${M extends ResizeCropFocalPointMode
+    ? (P extends FocalPoint ? P : never)
+    : (P extends Fill ? NormalizeFill<P> : never)
+  }/${F}`
 export function createCdnMediaUrl (
   cdnUrl: CdnUrl,
   filePath: FilePath,
@@ -83,9 +114,7 @@ export function createCdnMediaUrl (
   size?: Size,
   parameter?: Parameter,
 ): string {
-  const cdnUrlWithScheme = cdnUrl.startsWith('http')
-    ? cdnUrl
-    : `https://${cdnUrl}`
+  const cdnUrlWithScheme = ensureCdnUrlScheme(cdnUrl)
 
   if (mode === 'o') {
     return `${cdnUrlWithScheme}/media/${mode}/${filePath}`
