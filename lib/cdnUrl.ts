@@ -33,7 +33,7 @@ const normalizeSize = (size: Size): SizeString => {
     return `${size}x${size}`
   }
 
-  return `${size.at(1)}x${size.at(-1)}` as SizeString
+  return `${size.at(0)}x${size.at(-1)}` as SizeString
 }
 
 const normalizeFill = <F extends Fill>(fill: F)  => (
