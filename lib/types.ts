@@ -57,6 +57,6 @@ export type FocalPoint =
 
 export type Parameter = Fill | FocalPoint
 
-export type CdnUrl = `${string}.cloudfront.net`
+export type CdnUrl = `${string}.cloudfront.net` | `${string}.cdn.netflexapp.com`
 
 export type FilePath = `${number}/${string}`
